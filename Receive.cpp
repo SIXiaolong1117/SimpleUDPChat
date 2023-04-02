@@ -39,7 +39,7 @@ int main()
     while (1)
     {
         // 接收数据
-        char recvBuf[1024];
+        char recvBuf[1024] = {0};
         int recvSize;
         sockaddr_in fromAddr;
         int fromAddrLen = sizeof(fromAddr);
