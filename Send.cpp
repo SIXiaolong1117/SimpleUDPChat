@@ -24,7 +24,7 @@ int main()
         return 1;
     }
 
-    // 设置服务器地址和端口号
+    // 设置目标主机地址和端口号
     char *HostIP = "127.0.0.1";
     int HostPort = 1234;
     string HostIPtmp;
@@ -35,8 +35,20 @@ int main()
     cin >> HostPort;
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(1234);
-    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    serverAddr.sin_port = htons(HostPort);
+    serverAddr.sin_addr.s_addr = inet_addr(HostIP);
+
+    // 向目标主机地址发送打招呼消息
+    char *hello = "该主机将目标地址和端口指向了您。";
+    int dataSize = strlen(hello);
+    int ret = sendto(sock, hello, dataSize, 0, (sockaddr *)&serverAddr, sizeof(serverAddr));
+    if (ret == SOCKET_ERROR)
+    {
+        cout << "打招呼失败！" << endl;
+        closesocket(sock);
+        WSACleanup();
+        return 1;
+    }
 
     // 这里需要cin.ignore()
     // 原因在于下面的getline会获取到上面cin的最后一个回车，导致执行被跳过。
@@ -45,10 +57,17 @@ int main()
 
     while (1)
     {
+        // 基于当前系统的当前日期/时间
+        time_t now = time(0);
+        // 把 now 转换为字符串形式
+        char *dt = ctime(&now);
+
         // 输入要发送的数据
         char *data = "\0";
         string datatmp = "";
-        cout << "请输入要发送的内容：";
+        cout << endl
+             << dt;
+        cout << "【对方:" << HostIP << ":" << HostPort << "】@ ";
 
         getline(cin, datatmp);
         // cin >> datatmp;
@@ -64,9 +83,6 @@ int main()
             WSACleanup();
             return 1;
         }
-
-        cout << "发送数据成功！" << endl;
-        cout << "发送的数据为：" << data << endl;
     }
 
     // 关闭 Socket 和 Winsock
