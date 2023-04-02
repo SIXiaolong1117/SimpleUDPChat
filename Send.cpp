@@ -24,13 +24,27 @@ int main()
     }
 
     // 设置服务器地址和端口号
+    char *HostIP = "127.0.0.1";
+    int HostPort = 1234;
+    string HostIPtmp;
+    cout << "请输入目标主机IP：" << endl;
+    cin >> HostIPtmp;
+    HostIP = &HostIPtmp[0];
+    cout << "请输入目标主机端口：" << endl;
+    cin >> HostPort;
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(1234);
     serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
+    // 输入要发送的数据
+    char *data = "\0";
+    string datatmp;
+    cout << "请输入要发送的内容：" << endl;
+    cin >> datatmp;
+    data = &datatmp[0];
+
     // 发送数据
-    const char *data = "Hello, world!";
     int dataSize = strlen(data);
     int ret = sendto(sock, data, dataSize, 0, (sockaddr *)&serverAddr, sizeof(serverAddr));
     if (ret == SOCKET_ERROR)
@@ -42,6 +56,7 @@ int main()
     }
 
     cout << "发送数据成功！" << endl;
+    cout << "发送的数据为：" << data << endl;
 
     // 关闭 Socket 和 Winsock
     closesocket(sock);
