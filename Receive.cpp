@@ -36,23 +36,25 @@ int main()
         return 1;
     }
 
-    // 接收数据
-    char recvBuf[1024];
-    int recvSize;
-    sockaddr_in fromAddr;
-    int fromAddrLen = sizeof(fromAddr);
-    recvSize = recvfrom(sock, recvBuf, sizeof(recvBuf), 0, (sockaddr *)&fromAddr, &fromAddrLen);
-    if (recvSize == SOCKET_ERROR)
+    while (1)
     {
-        cout << "接收数据失败！" << endl;
-        closesocket(sock);
-        WSACleanup();
-        return 1;
+        // 接收数据
+        char recvBuf[1024];
+        int recvSize;
+        sockaddr_in fromAddr;
+        int fromAddrLen = sizeof(fromAddr);
+        recvSize = recvfrom(sock, recvBuf, sizeof(recvBuf), 0, (sockaddr *)&fromAddr, &fromAddrLen);
+        if (recvSize == SOCKET_ERROR)
+        {
+            cout << "接收数据失败！" << endl;
+            closesocket(sock);
+            WSACleanup();
+            return 1;
+        }
+
+        // 输出接收到的数据
+        cout << "从 " << inet_ntoa(fromAddr.sin_addr) << ":" << ntohs(fromAddr.sin_port) << " 接收到数据：" << recvBuf << endl;
     }
-
-    // 输出接收到的数据
-    cout << "从 " << inet_ntoa(fromAddr.sin_addr) << ":" << ntohs(fromAddr.sin_port) << " 接收到数据：" << recvBuf << endl;
-
     // 关闭 Socket 和 Winsock
     closesocket(sock);
     WSACleanup();
