@@ -26,10 +26,16 @@ int main()
         return 1;
     }
 
+    int HostPort;
+
+    cout << "请输入本地监听端口：";
+    cin >> HostPort;
+    cout << "设定的本地监听端口：" << HostPort << endl;
+
     // 绑定本地地址和端口号
     sockaddr_in localAddr;
     localAddr.sin_family = AF_INET;
-    localAddr.sin_port = htons(1234);
+    localAddr.sin_port = htons(HostPort);
     localAddr.sin_addr.s_addr = INADDR_ANY;
     if (bind(sock, (sockaddr *)&localAddr, sizeof(localAddr)) == SOCKET_ERROR)
     {
@@ -46,6 +52,9 @@ int main()
         // 把 now 转换为字符串形式
         char *dt = ctime(&now);
 
+        cout << endl
+             << "@ ";
+
         // 接收数据
         char recvBuf[1024] = {0};
         int recvSize;
@@ -61,8 +70,7 @@ int main()
         }
 
         // 输出接收到的数据
-        cout << endl
-             << dt
+        cout << dt
              << "从 " << inet_ntoa(fromAddr.sin_addr) << ":" << ntohs(fromAddr.sin_port)
              << " 接收到数据：" << recvBuf << endl;
     }
