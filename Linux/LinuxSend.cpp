@@ -1,27 +1,27 @@
-﻿#include <iostream>
-#include <winsock2.h>
-#include <string>
+﻿// MIT License
+// by Si Xiaolong (GitHub:@Direct5dom E-mail:sixiaolong2021@gmail.com)
 
-#pragma comment(lib, "ws2_32.lib")
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <net/if.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <iostream>
 
 using namespace std;
 
 int main()
 {
-    // 初始化 Winsock
-    WSADATA wsaData;
-    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
-    {
-        cout << "Winsock 初始化失败！" << endl;
-        return 1;
-    }
-
     // 创建 Socket
-    SOCKET sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (sock == INVALID_SOCKET)
+    int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (sock < 0)
     {
         cout << "创建 Socket 失败！" << endl;
-        return 1;
+        exit(1);
     }
 
     // 设置目标主机地址和端口号
@@ -42,12 +42,11 @@ int main()
     char *hello = "该主机将目标地址和端口指向了您。";
     int dataSize = strlen(hello);
     int ret = sendto(sock, hello, dataSize, 0, (sockaddr *)&serverAddr, sizeof(serverAddr));
-    if (ret == SOCKET_ERROR)
+    if (ret < 0)
     {
         cout << "打招呼失败！" << endl;
-        closesocket(sock);
-        WSACleanup();
-        return 1;
+        close(sock);
+        exit(1);
     }
 
     // 这里需要cin.ignore()
@@ -76,18 +75,14 @@ int main()
         // 发送数据
         int dataSize = strlen(data);
         int ret = sendto(sock, data, dataSize, 0, (sockaddr *)&serverAddr, sizeof(serverAddr));
-        if (ret == SOCKET_ERROR)
+        if (ret < 0)
         {
-            cout << "发送数据失败！" << endl;
-            closesocket(sock);
-            WSACleanup();
-            return 1;
+            cout << "打招呼失败！" << endl;
+            close(sock);
+            exit(1);
         }
     }
-
-    // 关闭 Socket 和 Winsock
-    closesocket(sock);
-    WSACleanup();
-
+    // 清理 Socket
+    close(sock);
     return 0;
 }
