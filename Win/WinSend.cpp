@@ -4,10 +4,64 @@
 #include <iostream>
 #include <winsock2.h>
 #include <string>
+#include <WS2tcpip.h>
 
 #pragma comment(lib, "ws2_32.lib")
 
 using namespace std;
+
+string resolveDNS(string domain_s)
+{
+    char *domain = &domain_s[0];
+
+    WSADATA wsaData;
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+    {
+        cout << "Winsock 初始化失败！" << endl;
+        return "解析失败";
+    }
+
+    ADDRINFOA hints;
+    ZeroMemory(&hints, sizeof(hints));
+    // 使用IPv4地址
+    hints.ai_family = AF_INET;
+    // 使用TCP协议
+    hints.ai_socktype = SOCK_STREAM;
+
+    ADDRINFOA *result = NULL;
+    int iResult = getaddrinfo(domain, NULL, &hints, &result);
+    if (iResult != 0)
+    {
+        std::cerr << "getaddrinfo 失败并出现错误：" << iResult << std::endl;
+        WSACleanup();
+        return "解析失败";
+    }
+
+    char ipstr[INET_ADDRSTRLEN];
+    for (ADDRINFOA *ptr = result; ptr != NULL; ptr = ptr->ai_next)
+    {
+        void *addr;
+        // 获取IP地址
+        if (ptr->ai_family == AF_INET)
+        {
+            sockaddr_in *ipv4 = (sockaddr_in *)ptr->ai_addr;
+            addr = &(ipv4->sin_addr);
+        }
+        else
+        {
+            sockaddr_in6 *ipv6 = (sockaddr_in6 *)ptr->ai_addr;
+            addr = &(ipv6->sin6_addr);
+        }
+        // 将IP地址转换为字符串
+        inet_ntop(ptr->ai_family, addr, ipstr, sizeof(ipstr));
+        std::cout << domain << " 解析为 " << ipstr << std::endl;
+    }
+
+    freeaddrinfo(result);
+    WSACleanup();
+
+    return ipstr;
+}
 
 int main()
 {
@@ -28,14 +82,20 @@ int main()
     }
 
     // 设置目标主机地址和端口号
-    char *HostIP = "127.0.0.1";
-    int HostPort = 1234;
+    char *HostIP;
+    int HostPort;
     string HostIPtmp;
+
     cout << "请输入目标主机IP：";
     cin >> HostIPtmp;
+    HostIPtmp = resolveDNS(HostIPtmp);
     HostIP = &HostIPtmp[0];
+    cout << "设定的目标主机IP：" << HostIP << endl;
+
     cout << "请输入目标主机端口：";
     cin >> HostPort;
+    cout << "设定的目标主机端口：" << HostPort << endl;
+
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(HostPort);
@@ -91,6 +151,5 @@ int main()
     // 关闭 Socket 和 Winsock
     closesocket(sock);
     WSACleanup();
-
     return 0;
 }
