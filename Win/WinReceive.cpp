@@ -71,8 +71,8 @@ int main()
 
         // 输出接收到的数据
         cout << endl
-             << "┌[" << dt << "] - [来自：" << inet_ntoa(fromAddr.sin_addr) << ":" << ntohs(fromAddr.sin_port) << "]" << endl
-             << "└[@ " << recvBuf << endl;
+             << "\033[36m┌[\033[0m\033[32m" << dt << "\033[0m\033[36m] - [\033[0m\033[33m来自：" << inet_ntoa(fromAddr.sin_addr) << ":" << ntohs(fromAddr.sin_port) << "\033[0m\033[36m]\033[0m" << endl
+             << "\033[36m└[@\033[0m " << recvBuf << endl;
     }
     // 关闭 Socket 和 Winsock
     closesocket(sock);

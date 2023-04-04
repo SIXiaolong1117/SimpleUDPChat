@@ -130,8 +130,8 @@ int main()
         char *data = "\0";
         string datatmp = "";
         cout << endl
-             << "┌[" << dt << "] - [目标：" << HostIP << ":" << HostPort << "]" << endl;
-        cout << "└[@ ";
+             << "\033[36m┌[\033[0m\033[32m" << dt << "\033[0m\033[36m] - [\033[0m\033[33m目标：" << HostIP << ":" << HostPort << "\033[0m\033[36m]\033[0m" << endl;
+        cout << "\033[36m└[@\033[0m ";
 
         getline(cin, datatmp);
         // cin >> datatmp;
