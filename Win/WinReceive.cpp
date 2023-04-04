@@ -49,12 +49,6 @@ int main()
 
     while (1)
     {
-        // 基于当前系统的当前日期/时间
-        time_t now = time(0);
-        // 把 now 转换为字符串形式
-        string dt = ctime(&now);
-        dt.pop_back();
-
         // 接收数据
         char recvBuf[1024] = {0};
         int recvSize;
@@ -68,6 +62,12 @@ int main()
             WSACleanup();
             return 1;
         }
+
+        // 基于当前系统的当前日期/时间
+        time_t now = time(0);
+        // 把 now 转换为字符串形式
+        string dt = ctime(&now);
+        dt.pop_back();
 
         // 输出接收到的数据
         cout << endl
