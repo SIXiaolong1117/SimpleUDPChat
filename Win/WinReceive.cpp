@@ -45,15 +45,15 @@ int main()
         return 1;
     }
 
+    cout << "等待接受数据中。" << endl;
+
     while (1)
     {
         // 基于当前系统的当前日期/时间
         time_t now = time(0);
         // 把 now 转换为字符串形式
-        char *dt = ctime(&now);
-
-        cout << endl
-             << "@ ";
+        string dt = ctime(&now);
+        dt.pop_back();
 
         // 接收数据
         char recvBuf[1024] = {0};
@@ -70,9 +70,9 @@ int main()
         }
 
         // 输出接收到的数据
-        cout << dt
-             << "从 " << inet_ntoa(fromAddr.sin_addr) << ":" << ntohs(fromAddr.sin_port)
-             << " 接收到数据：" << recvBuf << endl;
+        cout << endl
+             << "┌[" << dt << "] - [来自：" << inet_ntoa(fromAddr.sin_addr) << ":" << ntohs(fromAddr.sin_port) << "]" << endl
+             << "└[@ " << recvBuf << endl;
     }
     // 关闭 Socket 和 Winsock
     closesocket(sock);
